@@ -36,6 +36,17 @@ Trained a d20 (20-layer) Transformer model with custom identity fine-tuning:
 | Midtraining | 810 | 1.24 | BPB: 0.397 |
 | SFT | 700 | 0.48 | ARC-Easy: 47.9%, MMLU: 35.5% |
 
+### Training Curves
+
+**Base Pretraining**
+![Base Training](assets/base_training.png)
+
+**Midtraining**
+![Midtraining](assets/midtraining.png)
+
+**Supervised Fine-Tuning**
+![SFT Training](assets/sft_training.png)
+
 Training runs tracked on [Weights & Biases](https://wandb.ai/kiborisov-asc42-com).
 
 The model knows its name (Kibo), who created it, and responds with a distinct personality shaped by the synthetic training data.
