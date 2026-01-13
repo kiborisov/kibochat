@@ -38,7 +38,12 @@ Trained a d20 (20-layer) Transformer model with custom identity fine-tuning:
 
 ### Training Curves
 
-**Base Pretraining**
+**The Full Journey: 9 Runs, Multiple Crashes, One Success**
+![Training Journey](assets/training_journey.png)
+
+*Red dashed lines mark crashes/restarts. This is what 48 hours of debugging looks like.*
+
+**Base Pretraining (Final Successful Run)**
 ![Base Training](assets/base_training.png)
 
 **Midtraining**
