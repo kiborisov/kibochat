@@ -24,9 +24,19 @@ Trained a d20 (20-layer) Transformer model with custom identity fine-tuning:
 
 - **Infrastructure**: [Modal](https://modal.com/) cloud GPUs (8xH100)
 - **Training cost**: ~$230
-- **Training time**: ~10 hours total (base + midtraining + SFT)
+- **Training time**: ~12 hours total (base + midtraining + SFT)
 - **Model size**: 1.9B parameters
 - **Custom data**: 1000 synthetic conversations for identity training
+
+### Training Metrics
+
+| Stage | Steps | Loss | Key Metrics |
+|-------|-------|------|-------------|
+| Base Pretraining | 21,400 | 2.68 | CORE: 0.211, BPB: 0.816 |
+| Midtraining | 810 | 1.24 | BPB: 0.397 |
+| SFT | 700 | 0.48 | ARC-Easy: 47.9%, MMLU: 35.5% |
+
+Training runs tracked on [Weights & Biases](https://wandb.ai/kiborisov-asc42-com).
 
 The model knows its name (Kibo), who created it, and responds with a distinct personality shaped by the synthetic training data.
 
