@@ -4,6 +4,31 @@
 
 This is **kibochat** (codename "Kibo") - my personal implementation of a full-stack LLM trainer and inference engine, based on Andrej Karpathy's excellent [nanochat](https://github.com/karpathy/nanochat) project. The goal is to train and deploy a personalized language model from scratch for ~$100-$1000.
 
+## Background
+
+I built this project in 48 hours during the [TSFM (The School For Makers)](https://www.tsfm.ing/) hackathon - two days of no sleep, fueled by excitement and curiosity about how LLMs actually work under the hood.
+
+The experience was intense: watching the model train for hours, debugging crashes at 3am, implementing checkpoints after losing progress, optimizing batch sizes to fit in VRAM, and finally seeing my custom fine-tuned model respond with its own personality. There's something surreal about training a language model from scratch and then having a conversation with it.
+
+**What I learned:**
+- The full LLM training pipeline: pretraining, midtraining, SFT, and RL
+- How tokenizers work (BPE) and why they matter for model performance
+- Distributed training with PyTorch across multiple GPUs
+- The importance of checkpointing (learned this the hard way)
+- How synthetic data generation can inject personality into a model
+- Infrastructure costs and tradeoffs in ML training
+
+## Results
+
+Trained a d20 (20-layer) Transformer model with custom identity fine-tuning:
+
+- **Training cost**: ~$230 on 8xH100
+- **Training time**: ~10 hours total (base + midtraining + SFT)
+- **Model size**: 1.9B parameters
+- **Custom data**: 1000 synthetic conversations for identity training
+
+The model knows its name (Kibo), who created it, and responds with a distinct personality shaped by the synthetic training data.
+
 ## What is this?
 
 kibochat is a complete pipeline for:
@@ -27,7 +52,7 @@ kibochat is a complete pipeline for:
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/kibochat.git
+git clone https://github.com/kiborisov/kibochat.git
 cd kibochat
 
 # Create virtual environment and install dependencies
@@ -128,7 +153,9 @@ python -m pytest tests/test_rustbpe.py -v -s
 
 ## Acknowledgements
 
-This project is built on top of [nanochat](https://github.com/karpathy/nanochat) by Andrej Karpathy. All credit for the core architecture and training methodology goes to the original project.
+This project was built during the [TSFM (The School For Makers)](https://www.tsfm.ing/) hackathon.
+
+Built on top of [nanochat](https://github.com/karpathy/nanochat) by Andrej Karpathy - all credit for the core architecture and training methodology goes to the original project.
 
 Additional thanks to:
 - [modded-nanoGPT](https://github.com/KellerJordan/modded-nanogpt) for training optimizations
