@@ -6,7 +6,7 @@ This is **kibochat** (codename "Kibo") - my personal implementation of a full-st
 
 ## Background
 
-I built this project in 48 hours during the [TSFM (The School For Makers)](https://www.tsfm.ing/) hackathon - two days of no sleep, fueled by excitement and curiosity about how LLMs actually work under the hood.
+I built this project in 48 hours during the [TSFM (Toronto School of Foundation Modelling)](https://www.tsfm.ca/) hackathon - two days of no sleep, fueled by excitement and curiosity about how LLMs actually work under the hood.
 
 The experience was intense: watching the model train for hours, debugging crashes at 3am, implementing checkpoints after losing progress, optimizing batch sizes to fit in VRAM, and finally seeing my custom fine-tuned model respond with its own personality. There's something surreal about training a language model from scratch and then having a conversation with it.
 
