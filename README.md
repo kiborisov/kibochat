@@ -68,7 +68,7 @@ The synthetic data improved benchmark scores while teaching the model its identi
 
 ## Training Curves
 
-All metrics tracked on [Weights & Biases](https://wandb.ai/kiborisov-asc42-com).
+All metrics tracked on [Weights & Biases](https://wandb.ai/kiborisov-asc42-com). Charts below show the final runs (with synthetic data).
 
 ### Stage 1: Base Pretraining
 
@@ -110,7 +110,7 @@ Final polish - teaching the model to follow instructions and maintain identity.
 **Validation Loss** - Stable convergence around 1.0
 ![SFT Validation Loss](assets/sft_val_loss.png)
 
-**MMLU Accuracy** - Benchmark performance improving: 32.8% → 35.5%
+**MMLU Accuracy** - Benchmark performance: 32.8% → 35.5% (see comparison above for base vs synthetic)
 ![SFT MMLU](assets/sft_mmlu_acc.png)
 
 ---
