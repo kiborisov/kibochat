@@ -22,7 +22,8 @@ The experience was intense: watching the model train for hours, debugging crashe
 
 Trained a d20 (20-layer) Transformer model with custom identity fine-tuning:
 
-- **Training cost**: ~$230 on 8xH100
+- **Infrastructure**: [Modal](https://modal.com/) cloud GPUs (8xH100)
+- **Training cost**: ~$230
 - **Training time**: ~10 hours total (base + midtraining + SFT)
 - **Model size**: 1.9B parameters
 - **Custom data**: 1000 synthetic conversations for identity training
@@ -158,9 +159,9 @@ This project was built during the [TSFM (Toronto School of Foundation Modelling)
 Built on top of [nanochat](https://github.com/karpathy/nanochat) by Andrej Karpathy - all credit for the core architecture and training methodology goes to the original project.
 
 Additional thanks to:
+- [Modal](https://modal.com/) for cloud GPU infrastructure ($500 in credits from TSFM)
 - [modded-nanoGPT](https://github.com/KellerJordan/modded-nanogpt) for training optimizations
 - [HuggingFace](https://huggingface.co/) for FineWeb and SmolTalk datasets
-- [Modal](https://modal.com/) for GPU compute
 
 ## License
 
