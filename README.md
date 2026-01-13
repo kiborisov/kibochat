@@ -153,14 +153,14 @@ python -m pytest tests/test_rustbpe.py -v -s
 
 ## Acknowledgements
 
-This project was built during the [TSFM (The School For Makers)](https://www.tsfm.ing/) hackathon.
+This project was built during the [TSFM (Toronto School of Foundation Modelling)](https://www.tsfm.ca/) hackathon.
 
 Built on top of [nanochat](https://github.com/karpathy/nanochat) by Andrej Karpathy - all credit for the core architecture and training methodology goes to the original project.
 
 Additional thanks to:
 - [modded-nanoGPT](https://github.com/KellerJordan/modded-nanogpt) for training optimizations
 - [HuggingFace](https://huggingface.co/) for FineWeb and SmolTalk datasets
-- [Lambda](https://lambda.ai/) for GPU compute
+- [Modal](https://modal.com/) for GPU compute
 
 ## License
 
