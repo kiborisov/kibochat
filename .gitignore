@@ -1,0 +1,88 @@
+# Virtual environments
+.venv/
+venv/
+env/
+.env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Rust
+rustbpe/target/
+
+# Secrets and credentials - NEVER COMMIT THESE
+.env
+.env.local
+.env.development
+.env.production
+!.env.example
+openroutertoken.txt
+*token*.txt
+*secret*.txt
+*credentials*
+*.pem
+*.key
+
+# Model checkpoints and large files
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.gguf
+*.onnx
+model_*.pt
+checkpoint_*.pt
+
+# Generated files
+report.md
+eval_bundle/
+dev-ignore/
+identity_conversations.jsonl
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+speedrun.log
+
+# Cache
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
