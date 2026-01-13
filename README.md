@@ -2,68 +2,101 @@
 
 > A personalized ChatGPT clone built on [nanochat](https://github.com/karpathy/nanochat)
 
-This is **kibochat** (codename "Kibo") - my personal implementation of a full-stack LLM trainer and inference engine, based on Andrej Karpathy's excellent [nanochat](https://github.com/karpathy/nanochat) project. The goal is to train and deploy a personalized language model from scratch for ~$100-$1000.
+This is **kibochat** (codename "Kibo") - my personal LLM trained from scratch during a 48-hour hackathon. Built on Andrej Karpathy's [nanochat](https://github.com/karpathy/nanochat) framework.
 
 ## Background
 
-I built this project in 48 hours during the [TSFM (Toronto School of Foundation Modelling)](https://www.tsfm.ca/) hackathon - two days of no sleep, fueled by excitement and curiosity about how LLMs actually work under the hood.
+I built this at the [TSFM (Toronto School of Foundation Modelling)](https://www.tsfm.ca/) hackathon. Two days, no sleep, one goal: train my own language model from scratch and actually understand what's happening under the hood.
 
-The experience was intense: watching the model train for hours, debugging crashes at 3am, implementing checkpoints after losing progress, optimizing batch sizes to fit in VRAM, and finally seeing my custom fine-tuned model respond with its own personality. There's something surreal about training a language model from scratch and then having a conversation with it.
+The first few runs crashed. I'd watch the loss curve for an hour, step away for coffee, come back to a CUDA out-of-memory error. No checkpoints saved. Progress gone. That's when I learned why checkpointing matters - not from a textbook, but from losing 3 hours of training at 2am.
+
+By the second night, I had the pipeline stable. Watching the validation loss tick down from 0.827 to 0.816 over thousands of steps - that's when it clicked. This wasn't magic. It was matrix multiplications, gradient updates, and a lot of patience.
+
+The final piece was identity training. I generated 1000 synthetic conversations teaching the model who it is - Kibo, built by me, running on Modal's H100s. When I finally asked it "who are you?" and it answered correctly, that was the moment.
 
 **What I learned:**
-- The full LLM training pipeline: pretraining, midtraining, SFT, and RL
-- How tokenizers work (BPE) and why they matter for model performance
-- Distributed training with PyTorch across multiple GPUs
-- The importance of checkpointing (learned this the hard way)
-- How synthetic data generation can inject personality into a model
-- Infrastructure costs and tradeoffs in ML training
+- The full LLM training pipeline: pretraining → midtraining → SFT
+- Why checkpointing isn't optional (learned the hard way)
+- Distributed training with PyTorch across 8 GPUs
+- How synthetic data shapes model personality
+- The relationship between loss curves and actual model capability
 
-## Results
+## Training Results
 
-Trained a d20 (20-layer) Transformer model with custom identity fine-tuning:
+### Final Metrics
 
-- **Infrastructure**: [Modal](https://modal.com/) cloud GPUs (8xH100)
-- **Training cost**: ~$230
-- **Training time**: ~12 hours total (base + midtraining + SFT)
-- **Model size**: 1.9B parameters
-- **Custom data**: 1000 synthetic conversations for identity training
-
-### Training Metrics
-
-| Stage | Steps | Loss | Key Metrics |
-|-------|-------|------|-------------|
+| Stage | Steps | Final Loss | Key Results |
+|-------|-------|------------|-------------|
 | Base Pretraining | 21,400 | 2.68 | CORE: 0.211, BPB: 0.816 |
 | Midtraining | 810 | 1.24 | BPB: 0.397 |
 | SFT | 700 | 0.48 | ARC-Easy: 47.9%, MMLU: 35.5% |
 
-### Training Curves
+### Infrastructure
 
-**The Full Journey: 9 Runs, Multiple Crashes, One Success**
-![Training Journey](assets/training_journey.png)
+- **Compute**: [Modal](https://modal.com/) cloud GPUs (8xH100)
+- **Total cost**: ~$230 (from $500 TSFM credits)
+- **Training time**: ~12 hours total
+- **Model**: 1.9B parameters, d20 (20-layer Transformer)
 
-*Red dashed lines mark crashes/restarts. This is what 48 hours of debugging looks like.*
+---
 
-**Base Pretraining (Final Successful Run)**
-![Base Training](assets/base_training.png)
+## Training Curves
 
-**Midtraining**
-![Midtraining](assets/midtraining.png)
+All metrics tracked on [Weights & Biases](https://wandb.ai/kiborisov-asc42-com).
 
-**Supervised Fine-Tuning**
-![SFT Training](assets/sft_training.png)
+### Stage 1: Base Pretraining
 
-Training runs tracked on [Weights & Biases](https://wandb.ai/kiborisov-asc42-com).
+The foundation - training on FineWeb dataset to learn language patterns.
 
-The model knows its name (Kibo), who created it, and responds with a distinct personality shaped by the synthetic training data.
+**Training Loss** - Started high, steadily decreased as the model learned
+![Base Training Loss](assets/base_train_loss.png)
+
+**Validation BPB (Bits Per Byte)** - The real measure of generalization: 0.827 → 0.816
+![Base Validation BPB](assets/base_val_bpb.png)
+
+**GPU Utilization (MFU)** - Sustained ~21% model FLOP utilization across 8xH100
+![Base MFU](assets/base_train_mfu.png)
+
+**Throughput** - ~240K tokens/sec training speed
+![Base Throughput](assets/base_train_throughput.png)
+
+---
+
+### Stage 2: Midtraining
+
+Domain adaptation with chat-style data and custom identity conversations.
+
+**Training Loss** - Sharp drop from 1.9 → 1.24 as model adapts to conversational format
+![Mid Training Loss](assets/mid_train_loss.png)
+
+**Validation BPB** - Dramatic improvement: 0.70 → 0.40
+![Mid Validation BPB](assets/mid_val_bpb.png)
+
+---
+
+### Stage 3: Supervised Fine-Tuning (SFT)
+
+Final polish - teaching the model to follow instructions and maintain identity.
+
+**Training Loss** - Noisy but trending down (expected for small-batch SFT)
+![SFT Training Loss](assets/sft_train_loss.png)
+
+**Validation Loss** - Stable convergence around 1.0
+![SFT Validation Loss](assets/sft_val_loss.png)
+
+**MMLU Accuracy** - Benchmark performance improving: 32.8% → 35.5%
+![SFT MMLU](assets/sft_mmlu_acc.png)
+
+---
 
 ## What is this?
 
-kibochat is a complete pipeline for:
+kibochat is a complete pipeline for training and deploying a personalized LLM:
+
 - **Tokenization**: Custom BPE tokenizer (Rust + Python)
 - **Pretraining**: Base model training on FineWeb dataset
-- **Midtraining**: Domain adaptation and knowledge injection
+- **Midtraining**: Domain adaptation and identity injection
 - **SFT**: Supervised fine-tuning for chat capabilities
-- **RL**: Reinforcement learning for improved responses
 - **Inference**: Efficient KV-cache inference engine
 - **Deployment**: Web UI and CLI interfaces
 
@@ -78,31 +111,23 @@ kibochat is a complete pipeline for:
 ### Setup
 
 ```bash
-# Clone the repository
 git clone https://github.com/kiborisov/kibochat.git
 cd kibochat
-
-# Create virtual environment and install dependencies
 uv sync
-
-# Activate the environment
 source .venv/bin/activate
 ```
 
-### Training (~$100 tier, 4 hours on 8xH100)
+### Training
 
 ```bash
+# Full training (~$100, 4 hours on 8xH100)
 bash speedrun.sh
-```
 
-Or run in a screen session:
-```bash
+# Or in a screen session
 screen -L -Logfile speedrun.log -S speedrun bash speedrun.sh
 ```
 
 ### Chat with your model
-
-After training completes:
 
 ```bash
 # Web UI
@@ -112,83 +137,41 @@ python -m scripts.chat_web
 python -m scripts.chat_cli
 ```
 
-## Environment Variables
-
-For optional features, create a `.env` file (see `.env.example`):
-
-```bash
-# For experiment tracking (optional)
-WANDB_API_KEY=your_wandb_key
-
-# For HuggingFace datasets (optional)
-HUGGINGFACE_TOKEN=your_hf_token
-
-# For synthetic data generation (optional)
-OPENROUTER_API_KEY=your_openrouter_key
-```
-
 ## Project Structure
 
 ```
 kibochat/
-├── nanochat/                    # Core library
-│   ├── gpt.py                  # GPT Transformer model
-│   ├── tokenizer.py            # BPE tokenizer wrapper
-│   ├── engine.py               # Inference engine with KV cache
-│   └── ...
-├── scripts/                     # Training & inference scripts
-│   ├── base_train.py           # Base model training
-│   ├── mid_train.py            # Midtraining
-│   ├── chat_sft.py             # Supervised fine-tuning
-│   ├── chat_rl.py              # Reinforcement learning
-│   ├── chat_web.py             # Web UI server
-│   └── chat_cli.py             # CLI interface
-├── tasks/                       # Evaluation benchmarks
-├── rustbpe/                     # Rust BPE tokenizer
-├── tests/                       # Unit tests
-├── speedrun.sh                  # $100 training script
-└── run1000.sh                   # $800 training script
+├── nanochat/           # Core library (model, tokenizer, inference)
+├── scripts/            # Training & inference scripts
+├── tasks/              # Evaluation benchmarks (ARC, MMLU, GSM8K, HumanEval)
+├── rustbpe/            # Rust BPE tokenizer
+├── tests/              # Unit tests
+├── speedrun.sh         # $100 training script
+└── run1000.sh          # $800 training script
 ```
-
-## Hardware Requirements
-
-| Tier | Cost | Time | Hardware | Result |
-|------|------|------|----------|--------|
-| Speedrun | ~$100 | 4h | 8xH100 | d20, kindergartener-level |
-| Standard | ~$300 | 12h | 8xH100 | d26, GPT-2 level |
-| Full | ~$800 | 33h | 8xH100 | d32, beyond GPT-2 |
-
-The code also runs on:
-- Single GPU (8x slower, use gradient accumulation)
-- A100 nodes (slightly slower than H100)
-- CPU/MPS (for testing only, see `dev/runcpu.sh`)
 
 ## Customization
 
-To personalize your model's identity, edit `dev/gen_synthetic_data.py` and generate custom training data:
+To give your model a custom identity:
 
 ```bash
 export OPENROUTER_API_KEY=your_key
 python dev/gen_synthetic_data.py
 ```
 
-## Tests
-
-```bash
-python -m pytest tests/test_rustbpe.py -v -s
-```
+This generates synthetic conversations that get mixed into midtraining and SFT.
 
 ## Acknowledgements
 
-This project was built during the [TSFM (Toronto School of Foundation Modelling)](https://www.tsfm.ca/) hackathon.
+Built during [TSFM (Toronto School of Foundation Modelling)](https://www.tsfm.ca/) hackathon.
 
-Built on top of [nanochat](https://github.com/karpathy/nanochat) by Andrej Karpathy - all credit for the core architecture and training methodology goes to the original project.
+Core architecture from [nanochat](https://github.com/karpathy/nanochat) by Andrej Karpathy.
 
-Additional thanks to:
-- [Modal](https://modal.com/) for cloud GPU infrastructure ($500 in credits from TSFM)
-- [modded-nanoGPT](https://github.com/KellerJordan/modded-nanogpt) for training optimizations
+Thanks to:
+- [Modal](https://modal.com/) for $500 in GPU credits via TSFM
 - [HuggingFace](https://huggingface.co/) for FineWeb and SmolTalk datasets
+- [modded-nanoGPT](https://github.com/KellerJordan/modded-nanogpt) for training optimizations
 
 ## License
 
-MIT (same as nanochat)
+MIT
