@@ -38,13 +38,22 @@ I built this at the [TSFM (Toronto School of Foundation Modelling)](https://www.
 
 ### Custom Synthetic Data Experiment
 
-I ran SFT twice: once with Karpathy's base setup, then again with 1000 synthetic identity conversations generated via Gemini 2.5 Flash.
+I ran SFT twice: once with Karpathy's base setup (blue), then again with 1000 synthetic identity conversations generated via Gemini 2.5 Flash (red).
 
 | Metric | Base Setup | + 1K Synthetic | Change |
 |--------|-----------|----------------|--------|
 | MMLU | 34.1% | 35.5% | **+1.5%** |
 | ARC-Easy | 47.5% | 47.9% | +0.4% |
 | Train Loss | 1.27 | 0.48 | -62% |
+
+**MMLU Accuracy** - Red (with synthetic data) consistently outperforms blue (base)
+![MMLU Comparison](assets/compare_sft_mmlu.png)
+
+**SFT Training Loss** - Both noisy, but red trends lower by end of training
+![SFT Loss Comparison](assets/compare_sft_train_loss.png)
+
+**Midtraining Loss** - Nearly identical, as expected (synthetic data is small fraction)
+![Mid Loss Comparison](assets/compare_mid_train_loss.png)
 
 The synthetic data improved benchmark scores while teaching the model its identity. The dramatic train loss reduction shows the model successfully learned the custom personality data.
 
