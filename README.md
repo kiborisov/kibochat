@@ -8,18 +8,23 @@ This is **kibochat** (codename "Kibo") - my personal LLM trained from scratch du
 
 I built this at the [TSFM (Toronto School of Foundation Modelling)](https://www.tsfm.ca/) hackathon. Two days, no sleep, one goal: train my own language model from scratch and actually understand what's happening under the hood.
 
-The first few runs crashed. I'd watch the loss curve for an hour, step away for coffee, come back to a CUDA out-of-memory error. No checkpoints saved. Progress gone. That's when I learned why checkpointing matters - not from a textbook, but from losing 3 hours of training at 2am.
+### The Journey
 
-By the second night, I had the pipeline stable. Watching the validation loss tick down from 0.827 to 0.816 over thousands of steps - that's when it clicked. This wasn't magic. It was matrix multiplications, gradient updates, and a lot of patience.
+**Night 1: The crashes.** My first few runs died. I'd watch the loss curve for an hour, step away for coffee, come back to a CUDA out-of-memory error. No checkpoints. Progress gone. That's when I learned why checkpointing matters - not from a textbook, but from losing 3 hours of compute at 2am. I burned through 40+ GPU hours just on base training, most of it on failed runs.
 
-The final piece was identity training. I generated 1000 synthetic conversations teaching the model who it is - Kibo, built by me, running on Modal's H100s. When I finally asked it "who are you?" and it answered correctly, that was the moment.
+**Night 2: Stability.** By the second night, I had the pipeline stable. Watching the validation BPB tick down from 0.827 to 0.816 over thousands of steps - that's when it clicked. This wasn't magic. It was matrix multiplications, gradient updates, and patience.
 
-**What I learned:**
-- The full LLM training pipeline: pretraining → midtraining → SFT
-- Why checkpointing isn't optional (learned the hard way)
-- Distributed training with PyTorch across 8 GPUs
-- How synthetic data shapes model personality
-- The relationship between loss curves and actual model capability
+**The experiment.** After getting the base model working, I wanted to see if custom data actually helps. I generated 1000 synthetic conversations via Gemini 2.5 Flash teaching the model its identity - who it is, who built it, how to respond. Then I ran SFT twice: once with Karpathy's base setup, once with my synthetic data mixed in. Result: **MMLU improved 1.5%** and train loss dropped 62%. Small dataset, measurable impact.
+
+**The moment.** When I finally asked it "who are you?" and it answered "I'm Kibo, created by Kirill" - that was it. I'd trained a language model from scratch that knew who it was.
+
+### What I Learned
+
+- **The full pipeline**: pretraining (learn language) → midtraining (adapt to domain) → SFT (learn to chat)
+- **Checkpointing isn't optional** - learned this by losing hours of progress
+- **Distributed training**: PyTorch DDP across 8 GPUs, gradient accumulation when memory is tight
+- **Synthetic data works**: 1000 conversations measurably improved benchmarks
+- **Loss curves tell the story**: validation BPB is the real signal, not training loss
 
 ## Training Results
 
@@ -31,11 +36,23 @@ The final piece was identity training. I generated 1000 synthetic conversations 
 | Midtraining | 810 | 1.24 | BPB: 0.397 |
 | SFT | 700 | 0.48 | ARC-Easy: 47.9%, MMLU: 35.5% |
 
+### Custom Synthetic Data Experiment
+
+I ran SFT twice: once with Karpathy's base setup, then again with 1000 synthetic identity conversations generated via Gemini 2.5 Flash.
+
+| Metric | Base Setup | + 1K Synthetic | Change |
+|--------|-----------|----------------|--------|
+| MMLU | 34.1% | 35.5% | **+1.5%** |
+| ARC-Easy | 47.5% | 47.9% | +0.4% |
+| Train Loss | 1.27 | 0.48 | -62% |
+
+The synthetic data improved benchmark scores while teaching the model its identity. The dramatic train loss reduction shows the model successfully learned the custom personality data.
+
 ### Infrastructure
 
 - **Compute**: [Modal](https://modal.com/) cloud GPUs (8xH100)
 - **Total cost**: ~$230 (from $500 TSFM credits)
-- **Training time**: ~12 hours total
+- **Training time**: ~41 hours total (including crashes and restarts)
 - **Model**: 1.9B parameters, d20 (20-layer Transformer)
 
 ---
