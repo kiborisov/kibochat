@@ -126,6 +126,16 @@ kibochat is a complete pipeline for training and deploying a personalized LLM:
 - **Inference**: Efficient KV-cache inference engine
 - **Deployment**: Web UI and CLI interfaces
 
+### Training Optimizations
+
+This project uses cutting-edge techniques from the [modded-nanogpt speedrun](https://github.com/KellerJordan/modded-nanogpt) - a collaborative effort that reduced GPT training from 45 minutes to under 2 minutes on 8xH100:
+
+- **Muon optimizer** - Second-order optimization using Newton-Schulz iterations, faster convergence than AdamW
+- **Flash Attention** - Memory-efficient attention with sliding window patterns
+- **Mixed precision** - bfloat16 activations for speed without sacrificing stability
+- **Multi-token prediction** - Training signal from multiple output positions
+- **Fused operations** - Custom Triton kernels for embedding and layernorm
+
 ## Quick Start
 
 ### Prerequisites
