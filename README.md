@@ -187,6 +187,36 @@ python dev/gen_synthetic_data.py
 
 This generates synthetic conversations that get mixed into midtraining and SFT.
 
+## Modal Deployment
+
+The entire training pipeline can run on [Modal](https://modal.com/)'s cloud GPUs. See `modal_deploy.py` for the full deployment script.
+
+```bash
+# Install Modal
+pip install modal && modal setup
+
+# Set up secrets (optional, for W&B logging)
+modal secret create kibochat-secrets WANDB_API_KEY=your_key
+
+# Run full training pipeline (~$100, 4 hours on 8xA100)
+modal run modal_deploy.py
+
+# Quick test run (~$25, 1 hour)
+modal run modal_deploy.py::main --num-data-shards=8 --depth=12
+
+# Deploy web chat interface
+modal run modal_deploy.py::chat_web
+
+# Chat via CLI
+modal run modal_deploy.py::chat_cli --source=sft --prompt="Who are you?"
+```
+
+The Modal script handles:
+- Multi-GPU distributed training (torchrun)
+- Persistent volumes for checkpoints and data
+- Web UI deployment with FastAPI
+- Automatic checkpoint management
+
 ## Acknowledgements
 
 Built during [TSFM (Toronto School of Foundation Modelling)](https://www.tsfm.ca/) hackathon.
