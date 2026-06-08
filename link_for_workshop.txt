@@ -1,0 +1,5 @@
+Here's the urls for google collab and intro to kernels presentation 
+
+https://colab.research.google.com/drive/1MJYob1HOUyYAi1ZliEHRXVAncGP-MZm9?usp=sharing
+
+https://docs.google.com/presentation/d/1VShoIO3mtXQ5JVSu9qcFuz_I3HK7eYjilZvnrQPwKog/edit?usp=sharing
